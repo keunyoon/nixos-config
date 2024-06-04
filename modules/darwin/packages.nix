@@ -7,4 +7,5 @@ shared-packages ++ [
   appcleaner
   arc-browser
   xquartz
+  #karabiner-elements
 ]
