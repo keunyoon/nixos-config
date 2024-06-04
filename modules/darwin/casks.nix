@@ -14,6 +14,7 @@ _:
 
   # Utility Tools
   #"syncthing"
+  karabiner-elements
 
   # Entertainment Tools
   #"vlc"
