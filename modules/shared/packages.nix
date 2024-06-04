@@ -21,6 +21,9 @@ with pkgs; [
   yubikey-manager
   zip
 
+  # general utilities
+  #karabiner-elements
+
   # Encryption and security tools
   age
   age-plugin-yubikey
