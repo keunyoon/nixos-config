@@ -1,16 +1,14 @@
 { config, pkgs, lib, ... }:
 
-let name = "Dustin Lyons";
-    user = "dustin";
-    email = "dustin@dlyons.dev"; in
+let name = "Kevin Yoon";
+    user = "kevin";
+    email = "kyoon@fila.com";
+
+    toLua = str: "lua << EOF\n${str}\nEOF\n";
+    toLuaFile = file: "lua << EOF\n${builtins.readFile file}\nEOF\n";
+  in
 {
-
-  direnv = {
-      enable = true;
-      enableZshIntegration = true;
-      nix-direnv.enable = true;
-    };
-
+  # Shared shell configuration
   zsh = {
     enable = true;
     autocd = false;
@@ -27,55 +25,102 @@ let name = "Dustin Lyons";
           file = "p10k.zsh";
       }
     ];
+
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+
+    oh-my-zsh = {
+      enable = true;
+      plugins = [
+        "git"
+      ];
+    };
+
+    shellAliases = {
+      # eza aliases
+      ls = "colorls";
+      lc = "ls -lA --sd";
+
+      # zoxide
+      cd="z";
+
+      # bat
+      cat="bat";
+
+      # neovim
+      #vi="nvim";
+      #vim="nvim";
+      #nvim="nvim";
+      #neovim="nvim";
+    };
+
     initExtraFirst = ''
       if [[ -f /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh ]]; then
         . /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
         . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
       fi
 
-      if [[ "$(uname)" == "Linux" ]]; then
-        alias pbcopy='xclip -selection clipboard'
-      fi
-
       # Define variables for directories
       export PATH=$HOME/.pnpm-packages/bin:$HOME/.pnpm-packages:$PATH
       export PATH=$HOME/.npm-packages/bin:$HOME/bin:$PATH
-      export PATH=$HOME/.composer/vendor/bin:$PATH
       export PATH=$HOME/.local/share/bin:$PATH
-
-      export PNPM_HOME=~/.pnpm-packages
-      alias pn=pnpm
-      alias px=pnpx
 
       # Remove history data we don't want to see
       export HISTIGNORE="pwd:ls:cd"
 
+      # completion using arrow keys (based on history)
+      bindkey '^[[A' history-search-backward
+      bindkey '^[[B' history-search-forward
+
       # Ripgrep alias
-      alias search='rg -p --glob "!node_modules/*" --glob "!vendor/*" "$@"'
+      alias search=rg -p --glob '!node_modules/*'  $@
+
+      # default editor = vnim
+      export EDITOR="nvim"
+      export VISUAL="nvim"
 
       # Emacs is my editor
-      export ALTERNATE_EDITOR=""
-      export EDITOR="emacsclient -t"
-      export VISUAL="emacsclient -c -a emacs"
-      e() {
-          emacsclient -t "$@"
+      #export ALTERNATE_EDITOR=""
+      #export EDITOR="emacsclient -t"
+      #export VISUAL="emacsclient -c -a emacs"
+
+      #e() {
+      #    emacsclient -t "$@"
+      #}
+
+      # nix shortcuts
+      shell() {
+          nix-shell '<nixpkgs>' -A "$1"
       }
 
-      # Laravel Artisan
-      alias art='php artisan'
-
-      # PHP Deployer
-      alias deploy='dep deploy'
+      # pnpm is a javascript package manager
+      alias pn=pnpm
+      alias px=pnpx
 
       # Use difftastic, syntax-aware diffing
       alias diff=difft
 
-      # Always color ls and group directories
-      alias ls='ls --color=auto'
+      # ---- Zoxide (better cd) ----
+      eval "$(zoxide init zsh)"
 
-      # Reboot into my dual boot Windows partition
-      alias windows='systemctl reboot --boot-loader-entry=auto-windows'
+      # fzf shell integration
+      source <(fzf --zsh)
     '';
+  };
+
+  vscode = {
+    enable = true;
+    extensions = with pkgs.vscode-extensions; [
+      bbenoist.nix
+    ];
+  };
+
+   neovim = {
+    enable = true;
+    defaultEditor = true;
+    viAlias = true;
+    vimAlias = true;
+    vimdiffAlias = true;
   };
 
   git = {
@@ -98,9 +143,9 @@ let name = "Dustin Lyons";
     };
   };
 
-  vim = {
+/*   vim = {
     enable = true;
-    plugins = with pkgs.vimPlugins; [ vim-airline vim-airline-themes copilot-vim vim-startify vim-tmux-navigator ];
+    plugins = with pkgs.vimPlugins; [ vim-airline vim-airline-themes vim-startify vim-tmux-navigator ];
     settings = { ignorecase = true; };
     extraConfig = ''
       "" General
@@ -205,22 +250,128 @@ let name = "Dustin Lyons";
 
       let g:airline_theme='bubblegum'
       let g:airline_powerline_fonts = 1
-      '';
-     };
+    '';
+  }; */
+
+  ranger = {
+    enable = true;
+    settings ={
+      use_preview_script = true;
+      preview_images = true;
+      preview_images_method = "kitty";
+    };
+    plugins = [
+      {
+        name = "zoxide";
+        src = builtins.fetchGit {
+          url = "https://github.com/jchook/ranger-zoxide.git";
+          rev = "363df97af34c96ea873c5b13b035413f56b12ead";
+        };
+      }
+    ];
+  };
+
+  kitty = {
+    enable = true;
+    settings = {
+      # fonts
+      font_family = "MesloLGS NF";
+      font_size = "14.0";
+
+      # cursor
+      cursor = "#38ff9c";
+      cursor_text_color = "#000000";
+      cursor_shape = "block";
+
+      # scrollback
+      scrollback_lines = "2000";
+
+      # mouse
+      copy_on_select = "no";
+
+      # terminal bell
+      enable_audio_bell = "yes";
+
+      # window layout
+      remember_window_size = "yes";
+      initial_window_width = "640";
+      initial_window_height = "400";
+
+      # color scheme
+      foreground = "#ebddf4";
+      background = "#010b17";
+      background_opacity = "0.7";
+      background_blur = "10";
+      selection_foreground = "#000000";
+      selection_background = "#38ff9c";
+
+      # color table
+      # black
+      color0 = "#0b3b61";
+      color8 = "#62686c";
+      # red
+      color1 = "#ff3a3a";
+      color9 = "#ff54b0";
+      # green
+      color2 = "#52ffcf";
+      color10 = "#73ffd8";
+      # yellow
+      color3 = "#fff383";
+      color11 = "#fcf4ad";
+      # blue
+      color4 = "#1376f8";
+      color12 = "#378dfe";
+      # magenta
+      color5 = "#c792ea";
+      color13 = "#ae81ff";
+      # cyan
+      color6 = "#ff5dd4";
+      color14 = "#ff69d7";
+      # white
+      color7 = "#15fca2";
+      color15 = "#5ffbbe";
+
+      # env
+      shell_integration = "no-sudo";
+    };
+    #theme = "Adventure Time";
+    #theme = "Cobalt2";
+  };
 
   alacritty = {
     enable = true;
     settings = {
+      env = {
+        term = "xterm-256color";
+      };
+
       cursor = {
-        style = "Block";
+        style = {
+          shape = "Block";
+          blinking = "Always";
+        };
+      };
+
+      scrolling = {
+        history = 10000;
       };
 
       window = {
         opacity = 1.0;
+        decorations = "full";
+        dynamic_title = true;
+        blur = true;
+        startup_mode = "Windowed";
+        option_as_alt = "Both";
         padding = {
-          x = 24;
-          y = 24;
+          x = 10;
+          y = 10;
         };
+        dimensions = {
+          columns = 120;
+          lines = 30;
+        };
+        dynamic_padding = true;
       };
 
       font = {
@@ -228,38 +379,53 @@ let name = "Dustin Lyons";
           family = "MesloLGS NF";
           style = "Regular";
         };
+        offset ={
+          x = 1;
+          y = 1;
+        };
         size = lib.mkMerge [
           (lib.mkIf pkgs.stdenv.hostPlatform.isLinux 10)
           (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin 14)
         ];
       };
 
+      #coolnite color scheme
       colors = {
         primary = {
-          background = "0x1f2528";
-          foreground = "0xc0c5ce";
+          background = "#010b17";
+          foreground = "#ebddf4";
         };
 
         normal = {
-          black = "0x1f2528";
-          red = "0xec5f67";
-          green = "0x99c794";
-          yellow = "0xfac863";
-          blue = "0x6699cc";
-          magenta = "0xc594c5";
-          cyan = "0x5fb3b3";
-          white = "0xc0c5ce";
+          black = "#0b3b61";
+          blue = "#1376f8";
+          cyan = "#ff5dd4";
+          green = "#52ffcf";
+          magenta = "#c792ea";
+          red = "#ff3a3a";
+          white = "#15fca2";
+          yellow = "#fff383";
         };
 
         bright = {
-          black = "0x65737e";
-          red = "0xec5f67";
-          green = "0x99c794";
-          yellow = "0xfac863";
-          blue = "0x6699cc";
-          magenta = "0xc594c5";
-          cyan = "0x5fb3b3";
-          white = "0xd8dee9";
+          black = "#62686c";
+          blue = "#378dfe";
+          cyan = "#ff69d7";
+          green = "#73ffd8";
+          magenta = "#ae81ff";
+          red = "#ff54b0";
+          white = "#5ffbbe";
+          yellow = "#fcf4ad";
+        };
+
+        cursor = {
+          cursor = "#38ff9c" ;
+          text = "#000000";
+        };
+
+        selection = {
+          background = "#38ff9c";
+          text = "#000000";
         };
       };
     };
@@ -309,7 +475,7 @@ let name = "Dustin Lyons";
         # Use XDG data directory
         # https://github.com/tmux-plugins/tmux-resurrect/issues/348
         extraConfig = ''
-          set -g @resurrect-dir '/Users/dustin/.cache/tmux/resurrect'
+          set -g @resurrect-dir '$HOME/.cache/tmux/resurrect'
           set -g @resurrect-capture-pane-contents 'on'
           set -g @resurrect-pane-contents-area 'visible'
         '';

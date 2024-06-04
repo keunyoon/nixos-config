@@ -1,8 +1,7 @@
-{ pkgs, ... }:
+{ pkgs }:
 
 with pkgs; [
   # General packages for development and system management
-  act
   alacritty
   aspell
   aspellDicts.en
@@ -10,90 +9,65 @@ with pkgs; [
   bat
   btop
   coreutils
-  difftastic
-  du-dust
-  gcc
-  git-filter-repo
   killall
+  kitty
+#  kitty-themes
+#  kitty-img
   neofetch
   openssh
-  pandoc
   sqlite
+  vscode
   wget
+  yubikey-manager
   zip
 
   # Encryption and security tools
-  _1password
   age
   age-plugin-yubikey
   gnupg
   libfido2
 
   # Cloud-related tools and SDKs
-  # docker
-  # docker-compose
-  # awscli2 - marked broken Mar 22
-  flyctl
-  google-cloud-sdk
-  go
-  gopls
-  ngrok
-  ssm-session-manager-plugin
-  terraform
-  terraform-ls
-  tflint
+  docker
+  docker-compose
 
   # Media-related packages
   emacs-all-the-icons-fonts
-  imagemagick
   dejavu_fonts
   ffmpeg
   fd
   font-awesome
-  glow
   hack-font
-  jpegoptim
-  meslo-lgs-nf
   noto-fonts
   noto-fonts-emoji
-  pngquant
-
-  # PHP
-  php82
-  php82Packages.composer
-  php82Packages.php-cs-fixer
-  php82Extensions.xdebug
-  php82Packages.deployer
-  phpunit
+  meslo-lgs-nf
 
   # Node.js development tools
-  fzf
-  nodePackages.live-server
-  nodePackages.nodemon
+  nodePackages.npm # globally install npm
   nodePackages.prettier
-  nodePackages.npm
   nodejs
 
-  # Source code management, Git, GitHub tools
-  gh
-
   # Text and terminal utilities
+  colorls
+  fzf
   htop
   hunspell
   iftop
   jetbrains-mono
-  jetbrains.phpstorm
   jq
+  poppler
+  ranger
+  rename
   ripgrep
-  slack
   tree
   tmux
   unrar
   unzip
+  wireguard-tools
+  zoxide
   zsh-powerlevel10k
 
   # Python packages
-  black
   python39
-  python39Packages.virtualenv
+  python39Packages.virtualenv # globally install virtualenv
 ]
