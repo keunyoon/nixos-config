@@ -22,7 +22,7 @@ with pkgs; [
   zip
 
   # general utilities
-  #karabiner-elements
+  
 
   # Encryption and security tools
   age
